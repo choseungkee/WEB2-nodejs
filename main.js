@@ -18,7 +18,7 @@
         </html>
         `;
   }
-  function listFarm (filelist){
+  function templateList (filelist){
         var list = '<ol>';
         var i = 0;
         while (i < filelist.length) {
@@ -39,8 +39,8 @@ if (pathname === '/'){
 	if (queryData.id === undefined){
       fs.readdir('./data', function(error, filelist){
           var title = "Welcome!";
-          var description = "Hello, Node.js !";
-          list = listFarm(filelist);
+          var description = "Hello, Node.js!";
+          list = templateList(filelist);
           body = `<h1>${title}</h1><p>${description}</p>`;
           var template = templateHTML(title,list,body);
           response.writeHead(200);
@@ -49,7 +49,7 @@ if (pathname === '/'){
       } else {
           fs.readdir('./data', function(error, filelist){
               fs.readFile(`./data/${queryData.id}`,'utf8', function(err,description){
-              list = listFarm(filelist);
+              list = templateList(filelist);
               body = `<h1>${title}</h1><p>${description}</p>`;
               var template = templateHTML(title,list,body);
               response.writeHead(200);

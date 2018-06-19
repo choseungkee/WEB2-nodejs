@@ -1,7 +1,7 @@
     var http = require('http');
     var fs = require('fs');
     var url = require('url');
-    //require로 선언하여 import 시키는 기능으로 보임
+    //require을 사용하여 fs 모듈을 가져오는 기능
 
 function templateHTML (title,list,body){
       return `
