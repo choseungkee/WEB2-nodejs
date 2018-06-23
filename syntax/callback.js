@@ -8,15 +8,19 @@ var a = function(){
   console.log('A');
 }
 
-a();
+a(); //변수 뒤에 함수기호를 붙여서 변수안의 함수를 호출 할 수 있다.
 */
 
 
 var a = function(){
-  console.log('A');
+  console.log('callbackTest');
 }
 
-a(); // 변수 뒤에 함수기호를 붙여서 변수안의 함수를 호출 할 수 있다.
+var b = function(){
+  console.log('CallbackTest2');
+}
+
+//callback();
 
 function slowfunc(callback){
   console.log(1);
@@ -25,9 +29,7 @@ function slowfunc(callback){
   callback();
 }
 
-var b = function(){
-  console.log('test');
-}
+
 
 slowfunc(a);
 slowfunc(b);
