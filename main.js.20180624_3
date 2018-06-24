@@ -2,7 +2,36 @@
   var fs = require('fs');
   var url = require('url');
   var qs = require('querystring');
-  var template = require('./lib/template.js');
+
+  var template = {
+    HTML:function(title,list,body,control){
+          return `
+          <!doctype html>
+          <html>
+          <head>
+            <title>WEB - ${title} </title>
+            <meta charset="utf-8">
+          </head>
+          <body>
+            <h1><a href="/">WEB2</a></h1>
+            ${list}
+            ${control}
+            ${body}
+          </body>
+          </html>
+          `;
+    },
+    List:function (filelist){
+          var list = '<ul>';
+          var i = 0;
+          while (i < filelist.length) {
+            list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+            i = i+1;
+          }
+          list = list +'</ul>';
+          return list;
+    }
+  }
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
@@ -43,7 +72,7 @@ var app = http.createServer(function(request,response){
               var title = "WEB2 - create";
               var list = template.List(filelist);
               var form = `
-                  <form action="/create_process" method="POST">
+                  <form action="http://192.168.1.214:3000/create_process" method="POST">
                     <p><input type="text" name = "title" placeholder = "Title"></p>
                     <p><textarea name = "description" placeholder = "Description"></textarea></p>
                     <p><input type ="submit"></p>
@@ -78,7 +107,7 @@ var app = http.createServer(function(request,response){
           var title = queryData.id;
           var list = template.List(filelist);
           var body = `
-              <form action="/update_process" method="POST">
+              <form action="http://192.168.1.214:3000/update_process" method="POST">
                 <input type = "hidden" name = "id" value = "${title}">
                 <p><input type="text" name = "title" placeholder = "Title" value = "${title}"></p>
                 <p><textarea name = "description" placeholder = "Description">${description}</textarea></p>
