@@ -17,13 +17,13 @@
   var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
-    console.log(url.parse(_url, true).query.id);
+//    console.log(url.parse(_url, true).query);
     var pathname = url.parse(_url, true).pathname;
     if (pathname === '/'){
     	if (queryData.id === undefined){
-          db.query(`select * from topic`, function(error,topics){
-            if(error){
-              throw error;
+          db.query(`SELECT * FROM topic`, function(err,topics){
+            if(err){
+              throw err;
             }
             var title = "Welcome!";
             var description = "Hello, Node.js!";
@@ -35,14 +35,10 @@
             response.end(HTML);
         });
       } else {
-          db.query(`SELECT * FROM topic`, function(error,topics){
-            if(error){
-              throw error;
-            }
-            db.query(`select * from topic LEFT JOIN author ON topic.author_id=author.id where topic.id = ?`,[queryData.id], function(error2,topic){
-              if(error2){
-                throw error2;
-              }
+          db.query(`SELECT * FROM topic`, function(err,topics){
+            if(err){throw err;}
+            db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id = ?`,[queryData.id], function(err2,topic){
+              if(err2){throw err2;}
               var title = topic[0].title;
               var description = topic[0].description;
               var list = template.List(topics);
@@ -61,14 +57,10 @@
         });
       }
     }else if(pathname === '/create'){
-          db.query(`select * from topic`, function(error,topics){
-            if(error){
-              throw error;
-            }
-            db.query(`SELECT * FROM author`, function(error2,authors){
-              if(error2){
-                throw error;
-              }
+          db.query(`SELECT * FROM topic`, function(err,topics){
+            if(err){throw err;}
+            db.query(`SELECT * FROM author`, function(err2,authors){
+              if(err2){throw err;}
               var title = "Create";
               var list = template.List(topics);
               var body = `
@@ -96,34 +88,28 @@
               });
               request.on('end',function(){
               var post = qs.parse(body);
-              db.query(`INSERT INTO topic (title,description,created,author_id)VALUES (?, ?, NOW(), ?)`,[post.title,post.description,post.author],function(error,results){
-                        if(error){
-                          throw error;
+              db.query(`INSERT INTO topic (title,description,created,author_id) VALUES (?, ?, NOW(), ?)`,[post.title,post.description,post.author],function(err,results){
+                        if(err){
+                          throw err;
                         }
                         response.writeHead(302, {Location: `/?id=${results.insertId}`});
                         response.end();
               });
             });
    }else if(pathname === `/update`){
-       db.query(`select * from topic`, function(error,topics){
-         if(error){
-           throw error;
-         }
-        db.query(`select * from topic where id = ?`,[queryData.id], function(error2,topic){
-          if(error2){
-            throw error2;
-          }
-          db.query(`SELECT * FROM author`, function(error3,authors){
-            if(error3){
-              throw error;
-            }
+       db.query(`SELECT * FROM topic`, function(err,topics){
+         if(err){throw err;}
+        db.query(`SELECT * FROM topic WHERE id = ?`,[queryData.id], function(err2,topic){
+          if(err2){throw err2;}
+          db.query(`SELECT * FROM author`, function(err3,authors){
+            if(err3){throw err;}
             var list = template.List(topic);
             var body = `
                 <form action="/update_process" method="POST">
                   <input type = "hidden" name = "id" value = "${topic[0].id}">
                   <p><input type="text" name = "title" placeholder = "Title" value = "${topic[0].title}"></p>
                   <p><textarea name = "description" placeholder = "Description">${topic[0].description}</textarea></p>
-                  <p>${template.selectAuthor(authors)}</p>
+                  <p>${template.selectAuthor(authors, topic[0].author_id)}</p>
                   <p><input type ="submit"></p>
                 </form>
             `;
@@ -145,11 +131,10 @@
               });
               request.on('end',function(){
               var post = qs.parse(body);
-              db.query(`UPDATE topic SET title=?, description=?, author_id=1 WHERE id =?`,[post.title, post.description, post.id], function(err,results){
+              db.query(`UPDATE topic SET title=?, description=?, author_id=? WHERE id =?`,[post.title, post.description, post.author, post.id], function(err,results){
                           if (err){
                             throw err;
                           }
-//                          console.log(post.id);
                           response.writeHead(302, {Location: `/?id=${post.id}`});
                           response.end();
                         });
@@ -169,7 +154,7 @@
                   if(err){
                     throw err;
                   }
-//                  console.log(`${post.id} was deleted`);
+                  console.log(`${post.id} was deleted`);
                   response.writeHead(302, {Location: '/'});
                   response.end();
                 });
